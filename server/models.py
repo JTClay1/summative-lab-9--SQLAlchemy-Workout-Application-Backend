@@ -4,6 +4,7 @@ from sqlalchemy.orm import validates
 db = SQLAlchemy()
 
 class Exercise(db.Model):
+    """Model representing a type of physical exercise."""
     __tablename__ = 'exercises'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -12,6 +13,7 @@ class Exercise(db.Model):
     category = db.Column(db.String)
     equipment_needed = db.Column(db.Boolean)
 
+    # Relationship to the join table, cascades delete to prevent orphaned records
     workout_exercises = db.relationship('WorkoutExercise', back_populates='exercise', cascade='all, delete-orphan')
 
     # Model Validation 1: Ensure name is at least 3 characters
@@ -30,9 +32,11 @@ class Exercise(db.Model):
         return category
 
     def __repr__(self):
+        # String representation for debugging
         return f'<Exercise {self.name}>'
 
 class Workout(db.Model):
+    """Model representing a specific workout session."""
     __tablename__ = 'workouts'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -45,15 +49,18 @@ class Workout(db.Model):
         db.CheckConstraint('duration_minutes > 0', name='check_duration_positive'),
     )
 
+    # Relationship to the join table, cascades delete to prevent orphaned records
     workout_exercises = db.relationship('WorkoutExercise', back_populates='workout', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f'<Workout {self.id} on {self.date}>'
 
 class WorkoutExercise(db.Model):
+    """Join table model linking Workouts and Exercises with specific session details."""
     __tablename__ = 'workout_exercises'
 
     id = db.Column(db.Integer, primary_key=True)
+    # Foreign keys linking to parent tables
     workout_id = db.Column(db.Integer, db.ForeignKey('workouts.id'))
     exercise_id = db.Column(db.Integer, db.ForeignKey('exercises.id'))
     
@@ -67,6 +74,7 @@ class WorkoutExercise(db.Model):
         db.CheckConstraint('sets >= 0', name='check_sets_non_negative'),
     )
 
+    # Relationships back to parent tables
     workout = db.relationship('Workout', back_populates='workout_exercises')
     exercise = db.relationship('Exercise', back_populates='workout_exercises')
 
