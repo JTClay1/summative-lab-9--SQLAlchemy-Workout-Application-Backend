@@ -4,7 +4,7 @@ from datetime import date
 from app import app
 from models import *
 
-with app.app_context():
+def seed_data():
     # Clear All Table data
     WorkoutExercise.query.delete()
     Exercise.query.delete()
@@ -26,6 +26,7 @@ with app.app_context():
     # Stage them, then save them
     db.session.add_all([workout1, workout2, workout3])
     db.session.commit()
+    
     # Create the Links (WorkoutExercises)
     # Linking workout1 (Upper Body) to exercise1 (Pushups)
     link1 = WorkoutExercise(workout=workout1, exercise=exercise1, reps=15, sets=3, duration_seconds=600)
@@ -41,3 +42,7 @@ with app.app_context():
     # Stage them, then save them
     db.session.add_all([link1, link2, link3, link4, link5]) 
     db.session.commit()
+
+if __name__ == '__main__':
+    with app.app_context():
+        seed_data()
